@@ -93,6 +93,10 @@ When you are ready for persistence:
 3. Add your ORM and migrations.
 4. Configure a pre-deploy migration command if needed.
 
+### Snapshot persistence
+
+This MVP stores processed crawl snapshots as JSONB rows when `DATABASE_URL` is available. If the database is absent, the app keeps using the in-memory mock fallback, so local development still works without extra setup.
+
 ## Future expansion
 
 The app is structured so persistent projects, crawl histories, authentication, and PostgreSQL-backed storage can be added without restructuring the core parsing and scoring layers.

@@ -4,6 +4,7 @@ import { useDeferredValue, useState } from "react";
 import { ArrowUpDown, Search } from "lucide-react";
 
 import { TaskDrawer } from "@/components/tasks/task-drawer";
+import { SnapshotBootstrap } from "@/components/state/snapshot-bootstrap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -54,6 +55,7 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
 
   return (
     <>
+      <SnapshotBootstrap snapshot={fallbackSnapshot} />
       <Card>
         <CardHeader>
           <CardTitle>Implementation task queue</CardTitle>

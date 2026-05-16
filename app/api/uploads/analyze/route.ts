@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { saveSeoSnapshot } from "@/lib/db/seo-snapshot-store";
 import { parseScreamingFrogUploads } from "@/lib/parsers/screaming-frog";
 import { createSeoSnapshot } from "@/lib/scoring/pipeline";
 import type { UploadedFilePayload } from "@/types/seo";
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
     domain: body.domain,
     projectName: body.projectName,
   });
+
+  await saveSeoSnapshot(snapshot);
 
   return NextResponse.json(snapshot);
 }

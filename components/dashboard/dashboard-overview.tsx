@@ -7,6 +7,7 @@ import { IssueClusters } from "@/components/dashboard/issue-clusters";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { RiskMatrix } from "@/components/dashboard/risk-matrix";
 import { TrendChart } from "@/components/dashboard/trend-chart";
+import { SnapshotBootstrap } from "@/components/state/snapshot-bootstrap";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useSeoStore } from "@/hooks/use-seo-store";
@@ -30,6 +31,7 @@ export function DashboardOverview({ fallbackSnapshot }: { fallbackSnapshot: SeoS
 
   return (
     <div className="space-y-6 lg:space-y-8">
+      <SnapshotBootstrap snapshot={fallbackSnapshot} />
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <Card className="overflow-hidden">
           <CardHeader>

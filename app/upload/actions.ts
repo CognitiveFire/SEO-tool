@@ -1,5 +1,6 @@
 "use server";
 
+import { saveSeoSnapshot } from "@/lib/db/seo-snapshot-store";
 import { parseScreamingFrogUploads } from "@/lib/parsers/screaming-frog";
 import { createSeoSnapshot } from "@/lib/scoring/pipeline";
 import type { UploadedFilePayload } from "@/types/seo";
@@ -10,11 +11,14 @@ export async function processUploadedExports(files: UploadedFilePayload[]) {
   }
 
   const { detectedExports, pages } = parseScreamingFrogUploads(files);
-
-  return createSeoSnapshot({
+  const snapshot = createSeoSnapshot({
     pages,
     detectedExports,
     domain: "uploaded-project.local",
     projectName: "Uploaded crawl",
   });
+
+  await saveSeoSnapshot(snapshot);
+
+  return snapshot;
 }
