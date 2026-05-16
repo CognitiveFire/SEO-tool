@@ -1,6 +1,6 @@
-# Signal Room
+# April Signal Room
 
-Signal Room is a production-style MVP for an AI-powered SEO operations platform. It is intentionally built around uploaded Screaming Frog exports rather than an in-app crawler.
+April Signal Room is a production-style MVP for an AI-powered SEO operations platform. It is intentionally built around uploaded Screaming Frog exports rather than an in-app crawler.
 
 ## Stack
 

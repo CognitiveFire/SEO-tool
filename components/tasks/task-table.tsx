@@ -8,7 +8,9 @@ import { SnapshotBootstrap } from "@/components/state/snapshot-bootstrap";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useLanguageStore } from "@/hooks/use-language-store";
 import { useSeoStore } from "@/hooks/use-seo-store";
+import { getCopy } from "@/lib/i18n/copy";
 import { formatNumber } from "@/lib/utils/format";
 import type { SeoSnapshot, TaskItem } from "@/types/seo";
 
@@ -27,6 +29,8 @@ function getPriorityTone(priority: TaskItem["priority"]) {
 
 export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot }) {
   const snapshot = useSeoStore((state) => state.snapshot) ?? fallbackSnapshot;
+  const language = useLanguageStore((state) => state.language);
+  const copy = getCopy(language);
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -58,8 +62,8 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
       <SnapshotBootstrap snapshot={fallbackSnapshot} />
       <Card>
         <CardHeader>
-          <CardTitle>Implementation task queue</CardTitle>
-          <CardDescription>Priority score = (Impact × Confidence × Scale) ÷ Complexity, surfaced as a calmer operating table rather than a noisy audit list.</CardDescription>
+          <CardTitle>{copy.tasks.title}</CardTitle>
+          <CardDescription>{copy.tasks.description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="grid gap-3 lg:grid-cols-[1.2fr_0.35fr_0.35fr_0.35fr]">
@@ -68,7 +72,7 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
               <input
                 className="w-full bg-transparent text-sm text-[color:var(--foreground)] outline-none placeholder:text-[color:var(--muted-foreground)]"
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search tasks, clusters, or business effects"
+                placeholder={copy.tasks.search}
                 value={search}
               />
             </label>
@@ -77,7 +81,7 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
               onChange={(event) => setPriorityFilter(event.target.value)}
               value={priorityFilter}
             >
-              <option value="all">All priorities</option>
+              <option value="all">{copy.tasks.allPriorities}</option>
               <option value="High">High</option>
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>
@@ -87,7 +91,7 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
               onChange={(event) => setStatusFilter(event.target.value)}
               value={statusFilter}
             >
-              <option value="all">All statuses</option>
+              <option value="all">{copy.tasks.allStatuses}</option>
               <option value="open">Open</option>
               <option value="in-progress">In progress</option>
               <option value="blocked">Blocked</option>
@@ -100,7 +104,7 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  Sort by {option.label}
+                  {copy.tasks.sortBy} {option.label}
                 </option>
               ))}
             </select>
@@ -111,14 +115,14 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
               <thead className="bg-[color:var(--surface-strong)] text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">
                 <tr>
                   {[
-                    "Task",
-                    "Category",
-                    "SEO Impact",
-                    "Complexity",
-                    "Confidence",
-                    "Affected Pages",
-                    "Estimated Business Effect",
-                    "Status",
+                    copy.tasks.task,
+                    copy.tasks.category,
+                    copy.tasks.seoImpact,
+                    copy.tasks.complexity,
+                    copy.tasks.confidence,
+                    copy.tasks.affectedPages,
+                    copy.tasks.businessEffect,
+                    copy.tasks.status,
                   ].map((heading) => (
                     <th className="px-5 py-4 font-medium" key={heading}>
                       <div className="flex items-center gap-2">
@@ -135,7 +139,9 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
                     <td className="px-5 py-5 align-top">
                       <button className="text-left" onClick={() => setSelectedTask(task)} type="button">
                         <p className="font-medium text-[color:var(--foreground)]">{task.title}</p>
-                        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">Priority score {task.priorityScore}</p>
+                        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
+                          {copy.tasks.priority} {task.priorityScore}
+                        </p>
                       </button>
                     </td>
                     <td className="px-5 py-5 align-top text-sm text-[color:var(--foreground)]">{task.category}</td>
@@ -171,20 +177,20 @@ export function TaskTable({ fallbackSnapshot }: { fallbackSnapshot: SeoSnapshot 
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">SEO impact</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">{copy.tasks.seoImpact}</p>
                     <p className="mt-2 text-sm text-[color:var(--foreground)]">{task.seoImpact.toFixed(1)}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">Complexity</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">{copy.tasks.complexity}</p>
                     <p className="mt-2 text-sm text-[color:var(--foreground)]">{task.complexity}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">Affected pages</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-[color:var(--muted-foreground)]">{copy.tasks.affectedPages}</p>
                     <p className="mt-2 text-sm text-[color:var(--foreground)]">{formatNumber(task.affectedPages)}</p>
                   </div>
                 </div>
                 <Button className="mt-5" onClick={() => setSelectedTask(task)} variant="secondary">
-                  View details
+                  {copy.tasks.viewDetails}
                 </Button>
               </Card>
             ))}

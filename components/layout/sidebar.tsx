@@ -20,11 +20,11 @@ export function Sidebar() {
     <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 border-r border-[color:var(--border)] bg-[color:var(--sidebar)] px-6 py-8 lg:flex lg:flex-col">
       <div className="mb-10 flex items-center gap-3">
         <div className="flex size-11 items-center justify-center rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-sm font-semibold tracking-[0.2em] text-[color:var(--foreground)]">
-          SO
+          AS
         </div>
         <div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-foreground)]">SEO Operations</p>
-          <h1 className="text-lg font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">Signal Room</h1>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-foreground)]">April Signal Room</p>
+          <h1 className="text-lg font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">SEO Intelligence</h1>
         </div>
       </div>
 
@@ -38,13 +38,13 @@ export function Sidebar() {
               className={cn(
                 "group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition duration-200",
                 isActive
-                  ? "bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-[0_14px_30px_rgba(15,23,42,0.05)]"
+                  ? "border-l-2 border-[color:var(--accent)] bg-[color:var(--surface)] pl-[14px] text-[color:var(--foreground)] shadow-[0_14px_30px_rgba(15,23,42,0.05)]"
                   : "text-[color:var(--muted-foreground)] hover:bg-[color:var(--surface)] hover:text-[color:var(--foreground)]",
               )}
               href={item.href}
               key={item.href}
             >
-              <Icon className="size-4" />
+          <Icon className={cn("size-4", isActive && "text-[color:var(--accent)]")} />
               <span>{item.label}</span>
             </Link>
           );

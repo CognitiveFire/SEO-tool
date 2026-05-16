@@ -10,7 +10,9 @@
   --sidebar: rgba(245, 241, 235, 0.94);
   --border: rgba(25, 29, 36, 0.08);
   --border-strong: rgba(25, 29, 36, 0.14);
-  --chart-primary: #2f5d62;
+  --accent: #F05A28;
+  --accent-foreground: #ffffff;
+  --chart-primary: #F05A28;
   --chart-secondary: #8b5e3c;
   --chart-tertiary: #73846f;
   --chart-quaternary: #6d7f95;
@@ -27,7 +29,9 @@
     --sidebar: rgba(18, 22, 28, 0.94);
     --border: rgba(244, 239, 231, 0.08);
     --border-strong: rgba(244, 239, 231, 0.16);
-    --chart-primary: #9eb9b1;
+    --accent: #F97316;
+    --accent-foreground: #ffffff;
+    --chart-primary: #F97316;
     --chart-secondary: #d8b08c;
     --chart-tertiary: #c6d2aa;
     --chart-quaternary: #aab8d0;

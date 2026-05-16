@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, LoaderCircle, UploadCloud } from "lucide-react";
@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useLanguageStore } from "@/hooks/use-language-store";
 import { useSeoStore } from "@/hooks/use-seo-store";
+import { getCopy } from "@/lib/i18n/copy";
 import { detectExportType, getExportLabel } from "@/lib/parsers/export-types";
 import type { UploadedFilePayload } from "@/types/seo";
 
@@ -34,6 +36,9 @@ const requiredExports = [
 
 export function UploadArea() {
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const language = useLanguageStore((state) => state.language);
+  const copy = getCopy(language);
   const setSnapshot = useSeoStore((state) => state.setSnapshot);
   const setProcessing = useSeoStore((state) => state.setProcessing);
   const isProcessing = useSeoStore((state) => state.isProcessing);
@@ -52,14 +57,14 @@ export function UploadArea() {
       return {
         file,
         progress: 12,
-        label: exportType ? getExportLabel(exportType) : "Unsupported export",
+        label: exportType ? getExportLabel(exportType) : (language === "en" ? "Unsupported export" : "Ikke støttet eksport"),
         uploadedAt: new Date().toISOString(),
-      } satisfies UploadItem;
+      };
     });
 
     const unsupported = nextItems.filter((item) => !detectExportType(item.file.name));
     if (unsupported.length > 0) {
-      setError("Only recognised Screaming Frog CSV exports are supported in this MVP.");
+      setError(copy.upload.errorUnsupported);
       setItems(nextItems);
       return;
     }
@@ -80,9 +85,7 @@ export function UploadArea() {
         lastModified: item.file.lastModified,
       });
 
-      setItems((current) =>
-        current.map((entry) => (entry.file.name === item.file.name ? { ...entry, progress: 68 } : entry)),
-      );
+      setItems((current) => current.map((entry) => (entry.file.name === item.file.name ? { ...entry, progress: 68 } : entry)));
     }
 
     startTransition(async () => {
@@ -93,7 +96,7 @@ export function UploadArea() {
         setIsComplete(true);
         router.push("/dashboard");
       } catch (actionError) {
-        setError(actionError instanceof Error ? actionError.message : "Unable to process the uploaded exports.");
+        setError(actionError instanceof Error ? actionError.message : copy.upload.errorFailed);
         setProcessing(false);
       }
     });
@@ -104,16 +107,14 @@ export function UploadArea() {
       <Card className="relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[color:var(--border-strong)] to-transparent" />
         <CardHeader>
-          <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted-foreground)]">Upload workspace</p>
-          <CardTitle className="text-3xl">Ingest Screaming Frog exports</CardTitle>
-          <CardDescription className="max-w-2xl text-base leading-8">
-            Drag in multiple CSV exports, validate the set, process the crawl, and move directly into the executive dashboard.
-          </CardDescription>
+          <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted-foreground)]">{copy.upload.eyebrow}</p>
+          <CardTitle className="text-3xl">{copy.upload.title}</CardTitle>
+          <CardDescription className="max-w-2xl text-base leading-8">{copy.upload.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <motion.label
+          <motion.div
             animate={{ scale: isDragging ? 1.01 : 1 }}
-            className="flex min-h-[360px] cursor-pointer flex-col items-center justify-center rounded-[32px] border border-dashed border-[color:var(--border-strong)] bg-[color:var(--background)]/65 px-6 py-10 text-center"
+            className="flex min-h-[360px] flex-col items-center justify-center rounded-[32px] border border-dashed border-[color:var(--border-strong)] bg-[color:var(--background)]/65 px-6 py-10 text-center"
             onDragEnter={() => setIsDragging(true)}
             onDragLeave={() => setIsDragging(false)}
             onDragOver={(event) => {
@@ -130,30 +131,29 @@ export function UploadArea() {
             <div className="flex size-16 items-center justify-center rounded-[28px] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
               {isProcessing ? <LoaderCircle className="size-7 animate-spin" /> : <UploadCloud className="size-7" />}
             </div>
-            <h3 className="mt-6 text-2xl font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">
-              {isProcessing ? "Processing crawl exports" : "Drop your CSV files here"}
+            <h3 className="mt-6 text-xl font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">
+              {isProcessing ? copy.upload.processingTitle : copy.upload.dropTitle}
             </h3>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-[color:var(--muted-foreground)]">
-              Support is configured for internal HTML, response codes, titles, H1, canonicals, inlinks, and crawl overview exports. Additional exports can be added through the parser registry later.
-            </p>
+            <p className="mt-3 max-w-xl text-sm leading-7 text-[color:var(--muted-foreground)]">{copy.upload.support}</p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button type="button" variant="primary">
-                <span>Select CSV files</span>
+              <Button onClick={() => inputRef.current?.click()} type="button" variant="primary">
+                <span>{copy.upload.select}</span>
               </Button>
-              <StatusBadge>{detectedCount} exports detected</StatusBadge>
+              <StatusBadge>{detectedCount} {copy.upload.detected}</StatusBadge>
             </div>
             <input
+              ref={inputRef}
               accept=".csv,text/csv"
               className="hidden"
               multiple
               onChange={(event) => void ingestFiles(event.target.files)}
               type="file"
             />
-          </motion.label>
+          </motion.div>
           {error ? <p className="mt-4 text-sm text-rose-600 dark:text-rose-300">{error}</p> : null}
           {isComplete ? (
             <div className="mt-4 flex items-center gap-2 text-sm text-emerald-700 dark:text-emerald-300">
-              <CheckCircle2 className="size-4" /> Upload processed successfully. Redirecting to the dashboard.
+              <CheckCircle2 className="size-4" /> {copy.upload.success}
             </div>
           ) : null}
         </CardContent>
@@ -164,8 +164,8 @@ export function UploadArea() {
           <>
             <Card>
               <CardHeader>
-                <CardTitle>Upload progress</CardTitle>
-                <CardDescription>Detected exports, timestamps, and processing status for the current batch.</CardDescription>
+                <CardTitle>{copy.upload.progress}</CardTitle>
+                <CardDescription>{copy.upload.progressDescription}</CardDescription>
               </CardHeader>
               <CardContent>
                 <UploadProgress
@@ -180,7 +180,7 @@ export function UploadArea() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Expected export set</CardTitle>
+                <CardTitle>{copy.upload.expected}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-wrap gap-2">
                 {requiredExports.map((name) => (
@@ -193,11 +193,11 @@ export function UploadArea() {
           </>
         ) : (
           <EmptyState
-            action={<StatusBadge>Awaiting crawl input</StatusBadge>}
-            description="This product does not crawl websites directly. Upload exported Screaming Frog files to generate issue clustering, AI commentary, and prioritised implementation tasks."
-            eyebrow="Empty state"
+            action={<StatusBadge>{copy.upload.awaiting}</StatusBadge>}
+            description={copy.upload.emptyDescription}
+            eyebrow={copy.upload.eyebrow}
             icon={<UploadCloud className="size-6" />}
-            title="No exports uploaded yet"
+            title={copy.upload.emptyTitle}
           />
         )}
       </div>

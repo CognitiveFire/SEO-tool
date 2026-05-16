@@ -16,7 +16,7 @@ const serif = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Signal Room",
+  title: "April Signal Room",
   description: "AI-powered SEO operational intelligence built around uploaded Screaming Frog exports.",
 };
 
