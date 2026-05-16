@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BarChart3, CheckSquare2, Upload, WandSparkles } from "lucide-react";
 
+import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils/cn";
 
 const navigationItems = [
@@ -18,14 +19,8 @@ export function Sidebar() {
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 border-r border-[color:var(--border)] bg-[color:var(--sidebar)] px-6 py-8 lg:flex lg:flex-col">
-      <div className="mb-10 flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-2xl border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-sm font-semibold tracking-[0.2em] text-[color:var(--foreground)]">
-          AS
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted-foreground)]">April Signal Room</p>
-          <h1 className="text-lg font-semibold tracking-[-0.03em] text-[color:var(--foreground)]">SEO Intelligence</h1>
-        </div>
+      <div className="mb-10">
+        <Logo className="h-auto w-[192px] text-[color:var(--foreground)]" variant="full" />
       </div>
 
       <nav className="space-y-1.5">
