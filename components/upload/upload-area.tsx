@@ -1,11 +1,10 @@
 "use client";
 
-import { startTransition, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, LoaderCircle, Plus, UploadCloud, X } from "lucide-react";
 
-import { processUploadedExports } from "@/app/upload/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -79,17 +78,33 @@ export function UploadArea() {
       payload.push({ fileName: slot.file!.name, content, size: slot.file!.size, lastModified: slot.file!.lastModified });
     }
 
-    startTransition(async () => {
-      try {
-        const snapshot = await processUploadedExports(payload);
-        setSnapshot(snapshot);
-        setIsComplete(true);
-        router.push("/dashboard");
-      } catch (actionError) {
-        setError(actionError instanceof Error ? actionError.message : copy.upload.errorFailed);
-        setProcessing(false);
+    try {
+      const response = await fetch("/api/uploads/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+        body: JSON.stringify({
+          files: payload,
+          domain: "uploaded-project.local",
+          projectName: "Uploaded crawl",
+        }),
+      });
+
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error ?? copy.upload.errorFailed);
       }
-    });
+
+      const snapshot = await response.json();
+      setSnapshot(snapshot);
+      setIsComplete(true);
+      router.push("/dashboard");
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : copy.upload.errorFailed);
+      setProcessing(false);
+    }
   }
 
   return (
