@@ -34,17 +34,21 @@ export async function saveSeoSnapshot(snapshot: SeoSnapshot) {
     return false;
   }
 
-  await ensureSchema();
+  try {
+    await ensureSchema();
 
-  await pool.query(
-    `
-      insert into seo_snapshots (project_name, domain, snapshot, created_at)
-      values ($1, $2, $3::jsonb, $4)
-    `,
-    [snapshot.project.name, snapshot.project.domain, JSON.stringify(snapshot), snapshot.processedAt],
-  );
+    await pool.query(
+      `
+        insert into seo_snapshots (project_name, domain, snapshot, created_at)
+        values ($1, $2, $3::jsonb, $4)
+      `,
+      [snapshot.project.name, snapshot.project.domain, JSON.stringify(snapshot), snapshot.processedAt],
+    );
 
-  return true;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function loadLatestSeoSnapshot() {
@@ -57,17 +61,21 @@ export async function loadLatestSeoSnapshot() {
     return null;
   }
 
-  await ensureSchema();
+  try {
+    await ensureSchema();
 
-  const result = await pool.query<{ snapshot: SeoSnapshot }>(
-    `
-      select snapshot
-      from seo_snapshots
-      order by created_at desc
-      limit 1
-    `,
-  );
+    const result = await pool.query<{ snapshot: SeoSnapshot }>(
+      `
+        select snapshot
+        from seo_snapshots
+        order by created_at desc
+        limit 1
+      `,
+    );
 
-  const snapshot = result.rows[0]?.snapshot;
-  return snapshot ?? null;
+    const snapshot = result.rows[0]?.snapshot;
+    return snapshot ?? null;
+  } catch {
+    return null;
+  }
 }
