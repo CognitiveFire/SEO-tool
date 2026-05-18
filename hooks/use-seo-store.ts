@@ -12,6 +12,7 @@ interface SeoStoreState {
   lastUploadAt: string | null;
   setSnapshot: (snapshot: SeoSnapshot) => void;
   setProcessing: (isProcessing: boolean) => void;
+  updateProjectDomain: (domain: string) => void;
   resetSnapshot: () => void;
 }
 
@@ -30,6 +31,16 @@ export const useSeoStore = create<SeoStoreState>()(
           isProcessing: false,
         }),
       setProcessing: (isProcessing) => set({ isProcessing }),
+      updateProjectDomain: (domain) =>
+        set((state) => ({
+          snapshot: {
+            ...state.snapshot,
+            project: {
+              ...state.snapshot.project,
+              domain: domain.trim() || state.snapshot.project.domain,
+            },
+          },
+        })),
       resetSnapshot: () => set({ snapshot: fallbackSnapshot, lastUploadAt: null, isProcessing: false }),
     }),
     {
